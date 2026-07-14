@@ -48,3 +48,20 @@ The chart above shows the Linear Regression model's predictions closely tracking
 - Incorporate the two remaining crisis measures (Very Urgent Referrals, A&E liaison referrals) as additional model features
 - Explore Mental Health Act detention data as a complementary target
 - Reorganize code into reusable modules under `src/`
+
+## Experiment: Adding More Features (v2 exploration)
+
+We tested whether adding two more crisis-related measures (Very Urgent Referrals, A&E liaison referrals from the same month) as additional predictors would improve the model. This required dropping providers who don't report all three measures, shrinking the usable dataset from 646 to 400 rows.
+
+| Model | Rows Used | MAE | R² |
+|---|---|---|---|
+| Original (3 features: last month, 3-month average, month) | 646 | 13.51 | 0.946 |
+| Expanded (5 features, adding Very Urgent + A&E liaison) | 400 | 13.17 | 0.872 |
+
+While the expanded model's average error was marginally lower, its R² dropped meaningfully — likely because the smaller, filtered dataset made the model less reliable overall, not because the extra features were genuinely more predictive. We kept the original 3-feature model as the primary model, since it uses more data, generalizes better (higher R²), and is simpler to explain to a non-technical audience.
+
+## Forward-Looking Predictions
+
+Using the trained model, we generated genuine next-month forecasts for all providers with current, active reporting (i.e. excluding providers whose most recent report was more than one month behind the dataset's latest date). Predictions are saved in `reports/next_month_predictions.csv`.
+
+**A note on timing:** NHS Digital publishes MHSDS data with an inherent reporting lag — this dataset's most recent month is March 2026, so our "next month" forecast is for April 2026, not the present date. This reflects a real, common constraint when working with official published NHS statistics rather than a limitation of the model itself. In an operational setting, this model would be re-run each month as fresh data is published, keeping forecasts as current as the underlying data allows.
